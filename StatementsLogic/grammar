@@ -1,0 +1,14 @@
+{
+ {programa, asignaciones, asignacion, funciones, funcion, enunciado, operador},
+ {ID, true, false, '=', '&', '|', '<', '-', '>', '!', '{', '}', ','},
+ {
+  programa -> '{' asignaciones '}' funciones | '{' '}' funciones,
+  asignaciones -> asignacion ',' asignaciones | asignacion,
+  asignacion -> ID '=' true | ID '=' false,
+  funciones -> funcion '?' funciones | ,
+  funcion -> enunciado | '!' enunciado | enunciado operador enunciado,
+  enunciado -> ID | true | false | '(' funcion ')',
+  operador -> '&' | '|' | "->" | "<->",
+ },
+ programa
+}
