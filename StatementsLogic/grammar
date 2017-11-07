@@ -1,14 +1,14 @@
 {
- {programa, asignaciones, asignacion, funciones, funcion, enunciado, operador},
- {ID, true, false, '=', '&', '|', '<', '-', '>', '!', '{', '}', ','},
+ {executable, initializations, initialization, functions, function, statement, operator},
+ {ID, "true", "false", '{', '}', '(', ')', '=', '!', '&', '|', "->", "<->", ',', '?'},
  {
-  programa -> '{' asignaciones '}' funciones | '{' '}' funciones,
-  asignaciones -> asignacion ',' asignaciones | asignacion,
-  asignacion -> ID '=' true | ID '=' false,
-  funciones -> funcion '?' funciones | ,
-  funcion -> enunciado | '!' enunciado | enunciado operador enunciado,
-  enunciado -> ID | true | false | '(' funcion ')',
-  operador -> '&' | '|' | "->" | "<->",
+  executable -> '{' initializations '}' functions | '{' '}' functions,
+  initializations -> initialization ',' initializations | initialization,
+  initialization -> ID '=' true | ID '=' false,
+  functions -> function '?' functions | ,
+  function -> statement | '!' statement | statement operator statement,
+  statement -> ID | "true" | "false" | '(' function ')',
+  operator -> '&' | '|' | "->" | "<->",
  },
- programa
+ executable
 }

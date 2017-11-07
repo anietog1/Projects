@@ -1,71 +1,21 @@
 #pragma once
 
-#include "ast.h"
-#include "scanner.h"
+#include "AST.h"
+#include "Scanner.h"
 
 class Parser {
  public:
-   Parser(istream* in);
+   Parser(ifstream* in);
    ~Parser();
-
-   AST* parse();
-
+   AST* nextEvaluation();
  private:
-   AST* prog();
-   AST* expr();
-   AST* restExpr(AST* e);
-   AST* term();
-   AST* restTerm(AST* t);
-   AST* storable();
-   AST* factor();
-
+   AST* exe();
+   AST* inits();
+   AST* init();
+   AST* funcs();
+   AST* func();
+   AST* statement();
+   AST* operator();
+   
    Scanner* scan;
 };
-/*
-Grammar LL
- {
-  {EOF, number, R, S, +, -, *, /,},
-  {Prog, Expr, RestExpr, Term,
-   RestTerm, Storable, Factor},
-  {
-   Prog -> Expr EOF,
-   Expr -> Term RestExpr,
-   RestExpr -> + Term RestExpr
-              |- Term RestExpr
-	      |,
-   Term -> Storable RestTerm,
-   RestTerm -> * Storable RestTerm
-              |/ Storable RestTerm
-	      |,
-   Storable -> Factor S
-              |Factor,
-   Factor -> number
-            |R
-	    |(Expr)
-  },
-  Prog
- }
- */
-
-/*
-Grammar LALR(Previous):
-{
- {EOF, num, R, S, +, -, +, /, (, )},
- {Prog, Expr, Term, Storable, Factor},
- {
-  Prog -> Expr EOF,
-  Expr -> Expr + Term
-         |Expr - Term
-	 |Term,
-  Term -> Term * Storable
-         |Term / Storable
-	 |Storable,
-  Storable -> Factor S
-             |Factor,
-  Factor -> number
-           |R
-	   |(Expr)
- },
- Prog
-}
- */

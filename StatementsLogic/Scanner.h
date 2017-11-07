@@ -3,15 +3,19 @@
 #include <iostream>
 #include "Token.h"
 
+enum ScannerState {
+  SEARCHING_ID, SEARCHING_OPERATOR, BLANK
+};
+
 class Scanner {
  public:
-  Scanner(std::istream* in);
+  Scanner(std::ifstream* in);
   ~Scanner();
   Token* getToken();
   void putBackToken();
  private:
   Scanner();
-  std::istream* inStream;
+  std::ifstream* inStream;
   int lineCount;
   int colCount;
   bool needToken;
