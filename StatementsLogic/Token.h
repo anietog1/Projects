@@ -13,7 +13,7 @@ class Token {
   TokenType getType() const;
   int getLine() const;
   int getCol() const;
-  virtual string getLex() const;
+  virtual std::string getLex() const;
  private:
   TokenType type;
   int line,col;

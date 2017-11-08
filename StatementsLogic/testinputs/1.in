@@ -1,0 +1,10 @@
+{
+ a = true,
+ b = false,
+ c = true
+}
+
+a | b ?
+b -> c ?
+true & false ?
+true -> (a -> (b | c)) ?

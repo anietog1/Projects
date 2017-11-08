@@ -1,11 +1,11 @@
 #include "Scanner.h"
 #include "Exceptions.h"
-#include <iostream>
 #include <string>
 #include <cctype>
 #include <cstdio>
 
 using namespace std;
+#define debug
 
 const int numberOfKeywords = 2;
 
@@ -23,48 +23,32 @@ void unrecognizedTokenAt(int line, int column, const string &lex){
 
 TokenType getOperator(const string &lex){
   TokenType type;
-  
-  switch(lex){
-  case "{":
+  if(lex == "{")
     type = LKEY;
-    break;
-  case "}":
+  else if(lex == "}")
     type = RKEY;
-    break;
-  case "(":
+  else if(lex == "(")
     type = LPAREN;
-    break;
-  case ")":
+  else if(lex == ")")
     type = RPAREN;
-    break;
-  case ",":
+  else if( lex ==  ",")
     type = COMMA;
-    break;
-  case "=":
+  else if( lex ==  "=")
     type = ASSIGN;
-    break;
-  case "!":
+  else if( lex ==  "!")
     type = NEG;
-    break;
-  case "&":
+  else if( lex ==  "&")
     type = AND;
-    break;
-  case "|":
+  else if( lex ==  "|")
     type = OR;
-    break;
-  case "->":
+  else if( lex ==  "->")
     type = IMPL;
-    break;
-  case "<->":
+  else if( lex ==  "<->")
     type = EQUIV;
-    break;
-  case "?":
+  else if( lex ==  "?")
     type = QUERY;
-    break;
-  default:
+  else
     type = UNRECOGNIZED;
-    break;
-  }
 
   return type;
 }
@@ -100,7 +84,7 @@ Token* Scanner::getToken() {
   bool foundOne = false;
 
   int column, line,
-    c = inStream -> get();
+    c = inStream->get();
 
   while (!foundOne) {
     colCount += 1;
@@ -113,6 +97,8 @@ Token* Scanner::getToken() {
       
       if (isalpha(c))
 	state = SEARCHING_ID;
+      else if (c == '(' || c == ')' || c == '{' || c == '}')
+	state = SEARCHING_GROUPING_SIGN;
       else if (ispunct(c))
 	state = SEARCHING_OPERATOR;
       else if (c == '\n') {
@@ -134,6 +120,10 @@ Token* Scanner::getToken() {
 	type = ID;
 	foundOne = true;
       }
+      break;
+    case SEARCHING_GROUPING_SIGN:
+      type = OPERATOR;
+      foundOne = true;
       break;
     case SEARCHING_OPERATOR:
       if (ispunct(c));
@@ -162,13 +152,19 @@ Token* Scanner::getToken() {
     
     t = new LexicalToken(type, new string(lex), line, column);
   } else if (type == OPERATOR) {
-    type = getTokenType(lex);
+    type = getOperator(lex);
 
     if(type == UNRECOGNIZED)
       unrecognizedTokenAt(line, column, lex);
     
     t = new Token(type, line, column);
+  } else {
+    t = new Token(type, line, column);
   }
+
+#ifdef debug
+  cout << "Found \"" << lex << "\", with type " << t->getType() << endl;
+#endif
   
   return (lastToken = t);
 }

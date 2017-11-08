@@ -1,10 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include "Token.h"
 
 enum ScannerState {
-  SEARCHING_ID, SEARCHING_OPERATOR, BLANK
+  SEARCHING_ID, SEARCHING_OPERATOR, SEARCHING_GROUPING_SIGN, BLANK
 };
 
 class Scanner {
