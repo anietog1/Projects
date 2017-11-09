@@ -6,7 +6,7 @@
   executable -> trueids questions,
   trueids -> '{' idnames '}' | ,
   idnames -> ID restidnames | ,
-  restidnames -> ',' idnames | ,
+  restidnames -> ',' ID restidnames | ,
   questions -> expression '?' questions | ,
   
   expression -> statement restexpression,
