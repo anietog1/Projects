@@ -1,0 +1,20 @@
+{
+ {ID, '{', '}', '(', ')', '!', '&', '|', "->", "<->", ',', '?'},
+ {executable, trueids, idnames, restidnames, questions, expression, restexpression, statement},
+ {
+  executable -> trueids questions,
+  trueids -> '{' idnames '}' | ,
+  idnames -> ID restidnames | ,
+  restidnames -> ',' idnames | ,
+  questions -> expression '?' questions | ,
+  
+  expression -> multand restexpr | multor restexpr,
+  multand -> statement restmultand
+  restmultand -> '&' multand | ,
+  multor -> statement restmultor
+  restmultor -> '|' multor | ,
+  restexpression -> '&' statement | '|' statement | "->" statement | "<->" statement | ,
+  statement -> ID | '(' expression ')' | '!' statement,
+ },
+ executable
+}

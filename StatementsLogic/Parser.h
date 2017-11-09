@@ -9,13 +9,9 @@ class Parser {
    ~Parser();
    AST* nextEvaluation();
  private:
-   AST* exe();
-   AST* inits();
-   AST* init();
-   AST* funcs();
    AST* func();
    AST* statement();
-   AST* operator();
+   AST* operate();
    
    Scanner* scan;
 };

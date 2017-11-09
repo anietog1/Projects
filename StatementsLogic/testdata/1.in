@@ -1,8 +1,4 @@
-{
- a = true,
- b = false,
- c = true
-}
+{a, c, true}
 
 a | b ?
 b -> c ?
