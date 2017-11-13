@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
 
-enum TokenType{
-  OPERATOR, ID, LKEY, RKEY, LPAREN, RPAREN, ASSIGN, OR, AND, IMPL, EQUIV, NEG, KEYWORD, COMMA, QUERY, END, UNRECOGNIZED
+enum TokenType {
+  ID, KEYWORD, ASSIGN, LPAREN, RPAREN,
+  NEG, AND, OR, IMPL, EQUIV, QUERY, EOF, EOL,
+  UNRECOGNIZED
 };
 
 class Token {
@@ -16,7 +18,7 @@ class Token {
   virtual std::string getLex() const;
  private:
   TokenType type;
-  int line,col;
+  int line, col;
 };
 
 class LexicalToken: public Token {

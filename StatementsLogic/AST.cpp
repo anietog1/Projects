@@ -1,6 +1,8 @@
 #include "ast.h"
 #include "calculator.h"
 
+Calculator* calc = Calculator::getInstance();
+
 AST::AST() {}
 
 AST::~AST() {}
@@ -91,4 +93,14 @@ NegNode::NegNode(AST* sub)
 
 bool NegNode::evaluate(){
   return ! getSubNode()->evaluate();
+}
+
+AssignNode::AssignNode(AST* sub, string idname)
+  :UnaryNode(sub),idname(idname)
+{}
+
+bool AssignNode::evaluate(){
+  bool value = getSubTree()->evaluate();
+  calc->setValue(idname, value);
+  return value;
 }

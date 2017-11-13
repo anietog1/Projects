@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class AST {
  public:
@@ -25,14 +26,6 @@ class UnaryNode : public AST {
   AST* getSubTree() const;
  private:
   AST* subTree;
-};
-
-class StatementNode : public AST {
- public:
-  StatementNode(bool val);
-  bool evaluate();
- private:
-  bool val;
 };
 
 class OrNode : public BinaryNode {
@@ -64,3 +57,19 @@ class NegNode : public UnaryNode {
   NegNode(AST* sub);
   bool evaluate();
 }
+
+class AssignNode : public UnaryNode {
+ public:
+  AssignNode(AST* sub, std::string idname);
+  bool evaluate();
+ private:
+  std::string idname;
+};
+
+class StatementNode : public AST {
+ public:
+  StatementNode(bool val);
+  bool evaluate();
+ private:
+  bool val;
+};

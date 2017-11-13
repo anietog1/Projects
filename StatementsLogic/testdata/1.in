@@ -1,6 +1,8 @@
-{a, c, true}
+a = true
+c = true
+b = false
 
-a | b ?
-b -> c ?
-true & false ?
-true -> (a -> (b | c)) ?
+? a | b
+? b -> c
+? true & false
+? true -> (a -> (b | c))
