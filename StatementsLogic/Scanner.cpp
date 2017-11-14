@@ -1,11 +1,10 @@
 #include "Scanner.h"
 #include "Exceptions.h"
-#include <string>
 #include <cctype>
 #include <cstdio>
 
 using namespace std;
-#define debug
+//#define debug
 
 const int numberOfKeywords = 2;
 
@@ -13,47 +12,7 @@ const string keywords[numberOfKeywords] = {
   string("true"), string("false")
 };
 
-void unrecognizedTokenAt(int line, int column, const string &lex){
-  cerr << "Unrecognized token: \"" << lex
-       << "\" found at line " << line
-       << " and column " << column << endl;
-  
-  throw UNRECOGNIZED_TOKEN;
-}
-
-TokenType getOperator(const string &lex){
-  TokenType type;
-  if(lex == "{")
-    type = LKEY;
-  else if(lex == "}")
-    type = RKEY;
-  else if(lex == "(")
-    type = LPAREN;
-  else if(lex == ")")
-    type = RPAREN;
-  else if( lex ==  ",")
-    type = COMMA;
-  else if( lex ==  "=")
-    type = ASSIGN;
-  else if( lex ==  "!")
-    type = NEG;
-  else if( lex ==  "&")
-    type = AND;
-  else if( lex ==  "|")
-    type = OR;
-  else if( lex ==  "->")
-    type = IMPL;
-  else if( lex ==  "<->")
-    type = EQUIV;
-  else if( lex ==  "?")
-    type = QUERY;
-  else
-    type = UNRECOGNIZED;
-
-  return type;
-}
-
-Scanner::Scanner(ifstream* in):
+Scanner::Scanner(istream* in):
   inStream(in),
   lineCount(1),
   colCount(-1),
@@ -78,8 +37,8 @@ Token* Scanner::getToken() {
   }
 
   TokenType type;
-  string lex;
-  
+  string* lex;
+
   ScannerState state = BLANK;
   bool foundOne = false;
 
@@ -91,80 +50,148 @@ Token* Scanner::getToken() {
 
     switch (state) {
     case BLANK:
-      lex = "";
+      lex = new string();
       column = colCount;
       line = lineCount;
-      
+
       if (isalpha(c))
-	state = SEARCHING_ID;
-      else if (c == '(' || c == ')' || c == '{' || c == '}')
-	state = SEARCHING_GROUPING_SIGN;
-      else if (ispunct(c))
-	state = SEARCHING_OPERATOR;
-      else if (c == '\n') {
-	colCount = -1;
-	lineCount += 1;
-      }
-      else if (isspace(c));//ignore
-      else if (c == EOF || inStream -> eof()) {
+	state = S_ID;
+      else if(isblank(c));//ignore
+      else if(c == EOF || inStream->eof()) {
 	foundOne = true;
-	type = END;
-      }
-      else {
-	unrecognizedTokenAt(line, column, lex);//EXC
+	type = _EOF;
+      }else {
+	switch(c){
+	case '=':
+	  state = S_ASSIGN;
+	  break;
+	case '(':
+	  state = S_LPAREN;
+	  break;
+	case ')':
+	  state = S_RPAREN;
+	  break;
+	case '!':
+	  state = S_NEG;
+	  break;
+	case '&':
+	  state = S_AND;
+	  break;
+	case '|':
+	  state = S_OR;
+	  break;
+	case '-':
+	  state = S_IMPL;
+	  break;
+	case '<':
+	  state = S_EQUIV;
+	  break;
+	case '?':
+	  state = S_QUERY;
+	  break;
+	case '\n':
+	  colCount = -1;
+	  lineCount += 1;
+	  state = S_EOL;
+	  break;
+	default:
+	  //something wrong
+	  foundOne = true;
+	  type = UNRECOGNIZED;
+	  break;
+	}
       }
       break;
-    case SEARCHING_ID:
-      if (isalpha(c));//state = SEARCHING_ID
-      else {
+    case S_ID:
+      if(!isalpha(c)){
+	foundOne = true;
 	type = ID;
-	foundOne = true;
+
+	for(int i=0; i<numberOfKeywords; ++i)
+	  if(*lex == keywords[i])
+	    type = KEYWORD;
       }
       break;
-    case SEARCHING_GROUPING_SIGN:
-      type = OPERATOR;
+    case S_ASSIGN:
       foundOne = true;
+      type = ASSIGN;
       break;
-    case SEARCHING_OPERATOR:
-      if (ispunct(c));
-      else{
-	type = OPERATOR;
+    case S_LPAREN:
+      foundOne = true;
+      type = LPAREN;
+      break;
+    case S_RPAREN:
+      foundOne = true;
+      type = RPAREN;
+      break;
+    case S_NEG:
+      foundOne = true;
+      type = NEG;
+      break;
+    case S_AND:
+      foundOne = true;
+      type = AND;
+      break;
+    case S_OR:
+      foundOne = true;
+      type = OR;
+      break;
+    case S_IMPL:
+      if(lex->length() >= 2){
 	foundOne = true;
+
+	if((*lex) == "->")
+	  type = IMPL;
+	else
+	  type = UNRECOGNIZED;
       }
+      break;
+    case S_EQUIV:
+      if(lex->length() >= 3){
+	foundOne = true;
+
+	if((*lex) == "<->")
+	  type = EQUIV;
+	else
+	  type = UNRECOGNIZED;
+      }
+      break;
+    case S_QUERY:
+      foundOne = true;
+      type = QUERY;
+      break;
+    case S_EOL:
+      foundOne = true;
+      type = _EOL;
       break;
     }
-    
-    if (!foundOne) {
-      lex += static_cast<char>(c);
+
+    if(!foundOne){
+      *lex += static_cast<char>(c);
       c = inStream->get();
     }
   }
 
   inStream->putback(c);
   colCount -= 1;
-  
-  Token* t;
-  if (type == ID) {
-    for(int i=0; i < numberOfKeywords; ++i)
-      if(lex == keywords[i]) {
-	type = KEYWORD;
-      }
-    
-    t = new LexicalToken(type, new string(lex), line, column);
-  } else if (type == OPERATOR) {
-    type = getOperator(lex);
 
-    if(type == UNRECOGNIZED)
-      unrecognizedTokenAt(line, column, lex);
-    
-    t = new Token(type, line, column);
+  if(type == UNRECOGNIZED) {
+    cerr << "Unrecognized token: \"" << *lex << "\" found at line " << line
+	 << " and column " << column << "." << endl;
+
+    throw UNRECOGNIZED_TOKEN;
+  }
+
+  Token* t;
+  if (type == ID || type == KEYWORD) {
+    t = new LexicalToken(type, lex, line, column);
   } else {
     t = new Token(type, line, column);
   }
 
 #ifdef debug
-  cout << "Found \"" << lex << "\", with type " << t->getType() << endl;
+  cout << "Found \"" << *lex << "\", with type " << t->getType() << endl;
 #endif
-  
+
   return (lastToken = t);
 }
