@@ -4,38 +4,56 @@
 using namespace std;
 
 AST* Parser::executable() {
-}
-
-AST* Parser::lines() {
+  Token* t = scanner->getToken();
+  AST* ret;
+  
+  if(t->getType() == _EOL)
+    ret = new StatementNode(false);
+  else {
+    scanner->putBackToken();
+    ret = line();
+    t = scanner->getToken();
+    if(t->getType() != _EOL){
+      cerr << "Expected EOL." << endl;
+      throw PARSE_ERROR;
+    }
+  }
+  return ret;
 }
 
 AST* Parser::line() {
+  Token* t = scanner->getToken();
+  AST* ret;
   
+  if(t->getType() == QUERY)
+    ret = new QueryNode(expression());
+  else{
+    scanner->putBackToken();
+    ret = declaration();
+  }
+  
+  return ret;
 }
 
 AST* Parser::declaration() {
-  bool isGood = true;
-  string idname;
   AST* ret;
-
   Token* t = scanner->getToken();
   
   if(t->getType() == ID){
-    idname = t->getLex();
+    string& idname = t->getLex();
     t = scanner->getToken();
     
     if(t->getType() == ASSIGN){
-      ret = new AssignNode(expression(), idname);
-    }else
-      isGood = false;
-  }else
-    isGood = false;
-
-  if(!isGood)
-    //Throw anything
+      ret = new AssignNode(idname, expression());
+    } else {
+      cerr << "Expected '='" << endl;
+      throw PARSE_ERROR;
+    }
+  } else {
+    cerr << "Expected ID" << endl;
     throw ParseError;
-  else
-    return ret;
+  }
+  return ret;
 }
 
 AST* Parser::expression() {
@@ -111,27 +129,19 @@ AST* Parser::statement() {
   switch(t->getType()){
   case ID:
     {
-      string idname = t->getLex();
-    
-      if(calc->contains(idname))
-	ret = new StatementNode(calc->getValue(idname));
-      else{
-	cerr << "Variable with name \"" << idname
-	     << "\" doesn't exists." << endl;
-
-	throw PARSE_ERROR;
-      }
+      ret = new IdNode(t->getLex());
     }
     break;
   case KEYWORD:
     {
       string kw = t->getLex();
+
       if(kw == "true")
 	ret = new StatementNode(true);
       else if(kw == "false")
 	ret = new StatementNode(false);
       else{
-	cerr << "Unrecognized keyword: \"" << kw << "\", at line "
+	cerr << "Invalid keyword: \"" << kw << "\", at line "
 	     << t->getLine() << " and column " << t->getColumn() << "." << endl;
 
 	throw PARSE_ERROR;
@@ -152,7 +162,7 @@ AST* Parser::statement() {
     break;
   default:
     cerr << "Parse error at line " << t->getLine()
-	 << " and column " << t->getColumn() << "." << endl;
+	 << " and column " << t->getColumn() << ". Expected ID | ( | ! | true | false" << endl;
     break;
   }
 

@@ -5,9 +5,7 @@ class Calculator {
  public:
   ~Calculator();
   static Calculator* getInstance();
-  bool contains(const std::string& id);
-  bool getValue(const std::string& id);
-  void setValue(const std::string& id, bool value);
+  bool& operator[](const std::string& idname);
  private:
   std::map<std::string, bool> idvalues;
   //Singleton

@@ -9,7 +9,6 @@ enum TokenType {
 
 class Token {
  public:
-  Token();
   Token(TokenType typ, int line, int col);
   virtual ~Token();
   TokenType getType() const;
@@ -23,9 +22,9 @@ class Token {
 
 class LexicalToken: public Token {
  public:
-  LexicalToken(TokenType typ, std::string* lex, int line, int col);
+  LexicalToken(TokenType typ, const std::string* lex, int line, int col);
   ~LexicalToken();
   virtual std::string getLex() const;
  private:
-  std::string* lexeme;
+  const std::string* lexeme;
 };

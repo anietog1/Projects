@@ -1,10 +1,9 @@
 {
- {ID, 'true', 'false', '(', ')', '=', '!', '&', '|', '->', '<->', '?', EOF, EOL},
+ {ID, 'true', 'false', '(', ')', '=', '!', '&', '|', '->', '<->', '?', EOL},
  {executable, lines, line, declaration, expression, restexpression,
   multand, restmultand, multor, restmultor, statement},
  {
-  executable -> lines EOF,
-  lines -> line EOL lines | EOL lines | ,
+  executable -> line EOL | EOL,
   line -> declaration | '?' expression,
 
   declaration -> ID '=' expression,

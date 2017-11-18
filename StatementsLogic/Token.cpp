@@ -24,7 +24,7 @@ int Token::getCol() const {
 
 string Token::getLex() const { return ""; }
 
-LexicalToken::LexicalToken(TokenType typ, string* lex, int lineNum, int colNum):
+LexicalToken::LexicalToken(TokenType typ, const string* lex, int lineNum, int colNum):
   Token(typ,lineNum,colNum),
   lexeme(lex)
 {}

@@ -5,11 +5,10 @@
 
 class Parser {
  public:
-   Parser(ifstream* in);
+   Parser(istream* in);
    ~Parser();
-   AST* nextEvaluation();
- private:
    AST* executable();
+ private:
    AST* lines();
    AST* line();
    AST* declaration();

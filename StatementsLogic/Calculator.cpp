@@ -4,6 +4,8 @@ using namespace std;
 
 Calculator* Calculator::instance = NULL;
 
+Calculator::~Calculator(){}
+
 Calculator* Calculator::getInstance(){
   if(instance == NULL)
     instance = new Calculator();
@@ -11,14 +13,6 @@ Calculator* Calculator::getInstance(){
   return instance;
 }
 
-bool Calculator::contains(const string& id){
-  return idvalues.count(id);
-}
-
-bool Calculator::getValue(const string& id){
-  return idvalues[id];
-}
-
-void Calculator::setValue(const string& id, bool value){
-  idvalues[id] = value;
+bool& operator[](const string& idname){
+  return idvalues[idname];
 }

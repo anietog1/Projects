@@ -1,5 +1,8 @@
-#include "ast.h"
-#include "calculator.h"
+#include "AST.h"
+#include "Calculator.h"
+#include <iostream>
+
+using namespace std;
 
 Calculator* calc = Calculator::getInstance();
 
@@ -92,15 +95,27 @@ NegNode::NegNode(AST* sub)
 {}
 
 bool NegNode::evaluate(){
-  return ! getSubNode()->evaluate();
+  return ! getSubTree()->evaluate();
 }
 
-AssignNode::AssignNode(AST* sub, string idname)
+AssignNode::AssignNode(const string& idname, AST* sub)
   :UnaryNode(sub),idname(idname)
 {}
 
 bool AssignNode::evaluate(){
   bool value = getSubTree()->evaluate();
-  calc->setValue(idname, value);
+  (*calc)[idname] = value;
+
+  return value;
+}
+
+QueryNode::QueryNode(AST* sub):
+  UnaryNode(sub)
+{}
+
+bool QueryNode::evaluate(){
+  bool value = sub->evaluate();
+  cout << value << endl;
+
   return value;
 }
