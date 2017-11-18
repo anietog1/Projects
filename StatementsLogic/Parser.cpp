@@ -3,16 +3,23 @@
 
 using namespace std;
 
+Parser::Parser(istream* in)
+  :scan(new Scanner(in)){}
+
+AST* Parser::parse(){
+  return executable();
+}
+
 AST* Parser::executable() {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   if(t->getType() == _EOL)
     ret = new StatementNode(false);
   else {
-    scanner->putBackToken();
+    scan->putBackToken();
     ret = line();
-    t = scanner->getToken();
+    t = scan->getToken();
     if(t->getType() != _EOL){
       cerr << "Expected EOL." << endl;
       throw PARSE_ERROR;
@@ -22,13 +29,13 @@ AST* Parser::executable() {
 }
 
 AST* Parser::line() {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   if(t->getType() == QUERY)
     ret = new QueryNode(expression());
   else{
-    scanner->putBackToken();
+    scan->putBackToken();
     ret = declaration();
   }
   
@@ -37,11 +44,11 @@ AST* Parser::line() {
 
 AST* Parser::declaration() {
   AST* ret;
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   
   if(t->getType() == ID){
     string& idname = t->getLex();
-    t = scanner->getToken();
+    t = scan->getToken();
     
     if(t->getType() == ASSIGN){
       ret = new AssignNode(idname, expression());
@@ -61,7 +68,7 @@ AST* Parser::expression() {
 }
 
 AST* Parser::restExpression(AST* left) {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   switch (t->getType()) {
@@ -78,7 +85,7 @@ AST* Parser::restExpression(AST* left) {
     ret = new EquivNode(left, statement());
     break;
   default:
-    scanner->putBackToken();
+    scan->putBackToken();
     ret = left;
     break;
   }
@@ -91,14 +98,14 @@ AST* Parser::multAnd() {
 }
 
 AST* Parser::restMultAnd(AST* left) {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   if(t->getType() == AND){
     ret = new AndNode(left, multAnd());
   }else{
     ret = left;
-    scanner->putBackToken();
+    scan->putBackToken();
   }
   
   return ret;
@@ -109,21 +116,21 @@ AST* Parser::multOr() {
 }
 
 AST* Parser::restMultOr(AST* left) {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   if(t->getType() == OR){
     ret = new OrNode(left, multOr());
   }else{
     ret = left;
-    scanner->putBackToken();
+    scan->putBackToken();
   }
 
   return ret;
 }
 
 AST* Parser::statement() {
-  Token* t = scanner->getToken();
+  Token* t = scan->getToken();
   AST* ret;
   
   switch(t->getType()){
@@ -150,7 +157,7 @@ AST* Parser::statement() {
     break;
   case LPAREN:
     ret = expression();
-    t = scanner->getToken();
+    t = scan->getToken();
 
     if(t->getType != RPAREN){
       cerr << "Expected ')' at line " << t->getLine()
