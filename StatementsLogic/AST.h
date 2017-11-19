@@ -79,3 +79,11 @@ class QueryNode : public UnaryNode {
   QueryNode(AST* sub);
   bool evaluate();
 };
+
+class IdNode : public AST {
+ public:
+  IdNode(const std::string& idname);
+  bool evaluate();
+ private:
+  std::string idname;
+};

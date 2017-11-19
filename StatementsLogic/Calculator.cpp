@@ -4,6 +4,10 @@ using namespace std;
 
 Calculator* Calculator::instance = NULL;
 
+Calculator::Calculator(){
+
+}
+
 Calculator::~Calculator(){}
 
 Calculator* Calculator::getInstance(){
@@ -13,6 +17,6 @@ Calculator* Calculator::getInstance(){
   return instance;
 }
 
-bool& operator[](const string& idname){
+bool& Calculator::operator[](const string& idname){
   return idvalues[idname];
 }

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <istream>
 
 #include "Exceptions.h"
 #include "Calculator.h"
@@ -11,19 +13,19 @@
 
 using namespace std;
 
-Calculator* calc = Calculator::getInstance();
-
 AST* eval(const string& line){
   Parser* parser = new Parser(new istringstream(line));
   AST* tree = parser->parse();
   delete parser;
+  
   return tree;
 }
 
 void runInterpreter(){
   string line;
+  cout << "> ";
   while(getline(cin, line)){
-    AST* expr;
+    AST* expr = NULL;
 
     try{
       line += '\n';
@@ -34,19 +36,17 @@ void runInterpreter(){
     }
     
     delete expr;
+    cout << "> ";
   }
-
 }
 
-void execute(const ifstream& file){
-  cout << "Executing..." << endl;
-  char line[100] = {};
-
+void execute(ifstream& file){
+  string line;
+  
   try{
-    while(file.getline(line, 100)){
-      string sline = string(line);
-      sline += '\n';
-      AST* expr = eval(sline);
+    while(getline(file, line)){
+      line += '\n';
+      AST* expr = eval(line);
       expr->evaluate();
     
       delete expr;
@@ -62,6 +62,7 @@ int main(int argc, char** argv){
   } else {
     for(int i=1; i < argc; ++i){
       ifstream file(argv[i]);
+      //      cout << "Executing " << argv[i] << "..." << endl;
       execute(file);
       file.close();
     }

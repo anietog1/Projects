@@ -3,8 +3,15 @@
 
 using namespace std;
 
-Parser::Parser(istream* in)
-  :scan(new Scanner(in)){}
+Parser::Parser(istream* in){
+  scan = new Scanner(in);
+}
+
+Parser::~Parser(){
+  try {
+    delete scan;
+  }catch(...){}
+}
 
 AST* Parser::parse(){
   return executable();
@@ -47,7 +54,7 @@ AST* Parser::declaration() {
   Token* t = scan->getToken();
   
   if(t->getType() == ID){
-    string& idname = t->getLex();
+    string idname = t->getLex();
     t = scan->getToken();
     
     if(t->getType() == ASSIGN){
@@ -58,7 +65,7 @@ AST* Parser::declaration() {
     }
   } else {
     cerr << "Expected ID" << endl;
-    throw ParseError;
+    throw PARSE_ERROR;
   }
   return ret;
 }
@@ -149,7 +156,7 @@ AST* Parser::statement() {
 	ret = new StatementNode(false);
       else{
 	cerr << "Invalid keyword: \"" << kw << "\", at line "
-	     << t->getLine() << " and column " << t->getColumn() << "." << endl;
+	     << t->getLine() << " and column " << t->getCol() << "." << endl;
 
 	throw PARSE_ERROR;
       }
@@ -159,9 +166,9 @@ AST* Parser::statement() {
     ret = expression();
     t = scan->getToken();
 
-    if(t->getType != RPAREN){
+    if(t->getType() != RPAREN){
       cerr << "Expected ')' at line " << t->getLine()
-	   << " and column " << t->getColumn() << "." << endl;
+	   << " and column " << t->getCol() << "." << endl;
     }
     break;
   case NEG:
@@ -169,7 +176,7 @@ AST* Parser::statement() {
     break;
   default:
     cerr << "Parse error at line " << t->getLine()
-	 << " and column " << t->getColumn() << ". Expected ID | ( | ! | true | false" << endl;
+	 << " and column " << t->getCol() << ". Expected ID | ( | ! | true | false" << endl;
     break;
   }
 

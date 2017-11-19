@@ -14,11 +14,11 @@ class Parser {
   AST* line();
   AST* declaration();
   AST* expression();
-  AST* restexpression(AST* left);
-  AST* multand();
-  AST* restmultand(AST* left);
-  AST* multor();
-  AST* restmultor(AST* left);
+  AST* restExpression(AST* left);
+  AST* multAnd();
+  AST* restMultAnd(AST* left);
+  AST* multOr();
+  AST* restMultOr(AST* left);
   AST* statement();
    
   Scanner* scan;

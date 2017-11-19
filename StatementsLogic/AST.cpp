@@ -1,6 +1,7 @@
 #include "AST.h"
 #include "Calculator.h"
 #include <iostream>
+#include <ios>
 
 using namespace std;
 
@@ -114,8 +115,16 @@ QueryNode::QueryNode(AST* sub):
 {}
 
 bool QueryNode::evaluate(){
-  bool value = sub->evaluate();
-  cout << value << endl;
+  bool value = getSubTree()->evaluate();
+  cout << boolalpha << value << noboolalpha << endl;
 
   return value;
+}
+
+IdNode::IdNode(const string& idname)
+  :idname(idname)
+{}
+
+bool IdNode::evaluate(){
+  return (*calc)[idname];
 }
