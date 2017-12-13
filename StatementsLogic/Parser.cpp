@@ -177,6 +177,7 @@ AST* Parser::statement() {
   default:
     cerr << "Parse error at line " << t->getLine()
 	 << " and column " << t->getCol() << ". Expected ID | ( | ! | true | false" << endl;
+    throw PARSE_ERROR;
     break;
   }
 
