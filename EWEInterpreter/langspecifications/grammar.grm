@@ -1,0 +1,58 @@
+{
+ {
+  ':', ':=', Identifier, Integer, String, 'PC', '+', '-', '*', '/', '%', 'M', '[', ']',
+  'readInt', 'writeInt', 'readStr', 'writeStr', ',', '(', ')', 'goto', 'if', 'then',
+  'halt', 'break', 'equ', '>=', '>', '<=', '<', '=', '<>'
+ },
+ {
+  eweprog, executable, labeled_instr, instr, equates, memref, condition
+ },
+ {
+  eweprog ->
+   executable equates EOF,
+  executable ->
+   labeled_instr
+   | labeled_instr executable,
+  labeled_instr ->
+   Identifier ':' labeled_instr
+   | instr,
+  instr ->
+   memref ':=' Integer
+   | memref ':=' String
+   | memref ':=' 'PC' + Integer
+   | 'PC' := memref
+   | memref ':=' memref
+   | memref ':=' memref operator memref
+   | memref ':=' 'M' '[' memref '+' Integer ']'
+   | 'M' '[' memref + Integer ']' ':=' memref
+   | 'readInt' '(' memref ')'
+   | 'writeInt' '(' memref ')'
+   | 'readStr' '(' memref ',' memref ')'
+   | 'writeStr' '(' memref ')'
+   | 'goto' Integer
+   | 'goto' Identifier
+   | 'if' memref condition memref 'then' 'goto' Integer
+   | 'if' memref condition memref 'then' 'goto' Identifier
+   | 'halt'
+   | 'break',
+  equates ->
+   null
+   | 'equ' Identifier 'M' '[' Integer ']' equates,
+  memref ->
+   'M' '[' Integer ']'
+   | Identifier,
+  operator ->
+   '+'
+   | '-'
+   | '*'
+   | '/'
+   | '%',
+  condition ->
+   '>='
+   | '>'
+   | '<='
+   | '<'
+   | '='
+ },
+ eweprog
+}
