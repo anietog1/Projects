@@ -14,16 +14,24 @@
    labeled_instr
    | labeled_instr executable,
   labeled_instr ->
-   Identifier ':' labeled_instr
+   Identifier rest_labeled_instr
    | instr,
+  rest_labeled_instr ->
+   ':' labeled_instr
+   | ':=' Integer
+   | ':=' String
+   | ':=' 'PC' + Integer
+   | ':=' memref
+   | ':=' memref operator memref
+   | ':=' 'M' '[' memref '+' Integer ']',
   instr ->
-   memref ':=' Integer
-   | memref ':=' String
-   | memref ':=' 'PC' + Integer
+   'M' '[' Integer ']' ':=' Integer
+   | 'M' '[' Integer ']' ':=' String
+   | 'M' '[' Integer ']' ':=' 'PC' + Integer
    | 'PC' := memref
-   | memref ':=' memref
-   | memref ':=' memref operator memref
-   | memref ':=' 'M' '[' memref '+' Integer ']'
+   | 'M' '[' Integer ']' ':=' memref
+   | 'M' '[' Integer ']' ':=' memref operator memref
+   | 'M' '[' Integer ']' ':=' 'M' '[' memref '+' Integer ']'
    | 'M' '[' memref + Integer ']' ':=' memref
    | 'readInt' '(' memref ')'
    | 'writeInt' '(' memref ')'
