@@ -25,6 +25,8 @@ BinaryNode::~BinaryNode() {
   try {
     delete rightTree;
   } catch(...) {}
+
+  leftTree = rightTree = nullptr;
 }
    
 AST* BinaryNode::getLeftSubTree() const {
@@ -44,6 +46,8 @@ UnaryNode::~UnaryNode() {
   try {
     delete subTree;
   } catch (...) {}
+
+  subTree = nullptr;
 }
    
 AST* UnaryNode::getSubTree() const {

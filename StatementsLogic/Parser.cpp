@@ -11,6 +11,8 @@ Parser::~Parser(){
   try {
     delete scan;
   }catch(...){}
+  
+  scan = nullptr;
 }
 
 AST* Parser::parse(){
@@ -21,17 +23,23 @@ AST* Parser::executable() {
   Token* t = scan->getToken();
   AST* ret;
   
-  if(t->getType() == _EOL)
+  if(t->getType() == _EOL) {
     ret = new StatementNode(false);
-  else {
+    delete t;
+  } else {
     scan->putBackToken();
     ret = line();
     t = scan->getToken();
+
     if(t->getType() != _EOL){
       cerr << "Expected EOL." << endl;
+      delete t;
       throw PARSE_ERROR;
+    } else {
+      delete t;
     }
   }
+  
   return ret;
 }
 
@@ -39,9 +47,10 @@ AST* Parser::line() {
   Token* t = scan->getToken();
   AST* ret;
   
-  if(t->getType() == QUERY)
+  if(t->getType() == QUERY) {
     ret = new QueryNode(expression());
-  else{
+    delete t;
+  } else {
     scan->putBackToken();
     ret = declaration();
   }
@@ -55,18 +64,23 @@ AST* Parser::declaration() {
   
   if(t->getType() == ID){
     string idname = t->getLex();
+    delete t;
     t = scan->getToken();
     
     if(t->getType() == ASSIGN){
       ret = new AssignNode(idname, expression());
+      delete t;
     } else {
       cerr << "Expected '='" << endl;
+      delete t;
       throw PARSE_ERROR;
     }
   } else {
     cerr << "Expected ID" << endl;
+    delete t;
     throw PARSE_ERROR;
   }
+  
   return ret;
 }
 
@@ -80,15 +94,19 @@ AST* Parser::restExpression(AST* left) {
   
   switch (t->getType()) {
   case AND:
+    delete t;
     ret = new AndNode(left, multAnd());
     break;
   case OR:
+    delete t;
     ret = new OrNode(left, multOr());
     break;
   case IMPL:
+    delete t;
     ret = new ImplNode(left, statement());
     break;
   case EQUIV:
+    delete t;
     ret = new EquivNode(left, statement());
     break;
   default:
@@ -109,6 +127,7 @@ AST* Parser::restMultAnd(AST* left) {
   AST* ret;
   
   if(t->getType() == AND){
+    delete t;
     ret = new AndNode(left, multAnd());
   }else{
     ret = left;
@@ -127,6 +146,7 @@ AST* Parser::restMultOr(AST* left) {
   AST* ret;
   
   if(t->getType() == OR){
+    delete t;
     ret = new OrNode(left, multOr());
   }else{
     ret = left;
@@ -144,39 +164,47 @@ AST* Parser::statement() {
   case ID:
     {
       ret = new IdNode(t->getLex());
+      delete t;
     }
     break;
   case KEYWORD:
     {
       string kw = t->getLex();
-
-      if(kw == "true")
+      
+      if(kw == "true"){
 	ret = new StatementNode(true);
-      else if(kw == "false")
+        delete t;
+      }else if(kw == "false") {
 	ret = new StatementNode(false);
-      else{
+        delete t;
+      }else{
 	cerr << "Invalid keyword: \"" << kw << "\", at line "
 	     << t->getLine() << " and column " << t->getCol() << "." << endl;
-
+        delete t;
 	throw PARSE_ERROR;
       }
     }
     break;
   case LPAREN:
+    delete t;
     ret = expression();
     t = scan->getToken();
 
     if(t->getType() != RPAREN){
       cerr << "Expected ')' at line " << t->getLine()
 	   << " and column " << t->getCol() << "." << endl;
+      delete t;
+      throw PARSE_ERROR;
     }
     break;
   case NEG:
     ret = new NegNode(statement());
+    delete t;
     break;
   default:
     cerr << "Parse error at line " << t->getLine()
 	 << " and column " << t->getCol() << ". Expected ID | ( | ! | true | false" << endl;
+    delete t;
     throw PARSE_ERROR;
     break;
   }
