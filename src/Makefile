@@ -1,4 +1,4 @@
-stlogic: Main.o Parser.o Scanner.o AST.o Token.o Calculator.o
+lcaaalc: Main.o Parser.o Scanner.o AST.o Token.o Calculator.o
 	g++ -o $@ $^
 
 Main.o: Parser.cpp AST.cpp Parser.h AST.h Exceptions.h
@@ -14,4 +14,4 @@ Token.o: Token.cpp Token.h
 Calculator.o: Calculator.cpp Calculator.h
 
 clean:
-	rm -f *.o *.exe* *~ \#*
+	rm -f *.o *.exe* *~ \#* lcaaalc
